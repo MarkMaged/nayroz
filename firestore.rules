@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // "nayroz_users" — Nowruz greeting visitor log.
+    // Public (unauthenticated) visitors may CREATE a document here when they
+    // submit their name. Nobody — authenticated or not — may read the list
+    // back, update, or delete entries from the client. View visitors only
+    // via the Firebase Console.
+    match /nayroz_users/{visitorId} {
+
+      allow create: if
+        // Only "name" and "createdAt" are allowed — no extra fields.
+        request.resource.data.keys().hasOnly(['name', 'createdAt']) &&
+        request.resource.data.keys().hasAll(['name', 'createdAt']) &&
+
+        // "name" must exist, be a string, non-empty, and reasonably short.
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100 &&
+
+        // "createdAt" must be a timestamp, and specifically the server's
+        // own request time — this is what serverTimestamp() resolves to
+        // at write time, so this does NOT reject serverTimestamp() calls.
+        // It does reject a client-supplied/spoofed Timestamp value.
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.createdAt == request.time;
+
+      // No client — authenticated or not — may read, update, or delete.
+      allow read, update, delete: if false;
+    }
+
+    // Everything else is denied by Firestore's implicit default-deny —
+    // no rule anywhere grants access unless explicitly matched above.
+  }
+}

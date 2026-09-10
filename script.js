@@ -3,33 +3,36 @@
 // Vanilla JavaScript + Firebase Firestore (modular Web SDK, CDN)
 // =============================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import {
   getFirestore,
   collection,
   addDoc,
   serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 // -------------------------------------------------------------
-// 🔥 FIREBASE CONFIGURATION — PASTE YOUR REAL CONFIG HERE 🔥
+// 🔥 FIREBASE CONFIGURATION — project: nayroz-new-year 🔥
 //
-// Get this object from:
-//   Firebase Console → Project Settings → General →
-//   "Your apps" → Web app → SDK setup and configuration → Config
-//
-// See README.md for the full step-by-step guide.
+// This is the Firebase Web SDK config for the dedicated Nowruz
+// project. It is safe to keep in frontend code — it only
+// identifies the project, it does not grant admin access. Access
+// control is handled entirely by Firestore Security Rules (see
+// firestore.rules / README.md). Only Firestore is used here —
+// Firebase Analytics is intentionally not initialized, since this
+// app collects nothing beyond the visitor's name and timestamp.
 // -------------------------------------------------------------
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyDfGdkRYHNjDbPuoQoMjoQiRJ4mHSi6GVo",
+  authDomain: "nayroz-new-year.firebaseapp.com",
+  projectId: "nayroz-new-year",
+  storageBucket: "nayroz-new-year.firebasestorage.app",
+  messagingSenderId: "178291135911",
+  appId: "1:178291135911:web:1dca659a4abe50f1fbd282",
+  measurementId: "G-2T2XT3Y7BE",
 };
 
-const VISITORS_COLLECTION = "nowruz_visitors";
+const VISITORS_COLLECTION = "nayroz_users";
 const MAX_NAME_LENGTH = 100;
 
 let db = null;
@@ -100,14 +103,12 @@ async function saveVisitor(name) {
     throw new Error("Firebase is not initialized. Check firebaseConfig in script.js.");
   }
 
-  const visitorData = {
+  // Only "name" and "createdAt" are stored — no device, browser, or
+  // location information is collected.
+  await addDoc(collection(db, VISITORS_COLLECTION), {
     name,
     createdAt: serverTimestamp(),
-    userAgent: navigator.userAgent || "unknown",
-    language: navigator.language || "unknown",
-  };
-
-  await addDoc(collection(db, VISITORS_COLLECTION), visitorData);
+  });
 }
 
 // -------------------------------------------------------------

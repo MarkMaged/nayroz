@@ -1,0 +1,477 @@
+/* =========================================================
+   Nowruz Greeting — Stylesheet
+   Palette inspired by Persian spring: turquoise, gold, coral,
+   blossom pink, and fresh greens (Haft-Seen colors).
+   ========================================================= */
+
+:root {
+  --turquoise: #1fa39a;
+  --turquoise-dark: #0f6f68;
+  --gold: #e8b84b;
+  --coral: #ef8354;
+  --blossom: #ffb3c6;
+  --blossom-deep: #ff8fab;
+  --leaf: #6fae5f;
+  --cream: #fff8ee;
+  --ink: #2c2416;
+  --ink-soft: #5a4f3e;
+
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --shadow-soft: 0 20px 60px rgba(90, 40, 20, 0.18);
+
+  --font-display: "Playfair Display", "Vazirmatn", serif;
+  --font-body: "Poppins", "Vazirmatn", sans-serif;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  overflow-x: hidden;
+  position: relative;
+  background: #fdeedd;
+}
+
+/* ---------------------------------------------------------
+   Background sky gradient
+   --------------------------------------------------------- */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(255, 200, 150, 0.55), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 100% 10%, rgba(255, 179, 198, 0.5), transparent 60%),
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(31, 163, 154, 0.35), transparent 60%),
+    linear-gradient(160deg, #fff3e0 0%, #ffe3d1 30%, #ffd9e6 55%, #d9f2ea 100%);
+  background-size: 200% 200%;
+  animation: skyShift 22s ease-in-out infinite alternate;
+}
+
+@keyframes skyShift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 30%; }
+}
+
+/* ---------------------------------------------------------
+   Floating petals + sparkles (decorative, JS-populated)
+   --------------------------------------------------------- */
+.petals,
+.sparkles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -10%;
+  will-change: transform, opacity;
+  animation-name: petalFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
+  user-select: none;
+}
+
+@keyframes petalFall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% {
+    transform: translate3d(var(--drift, 40px), 110vh, 0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--gold) 60%, transparent 70%);
+  animation-name: sparkleTwinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: 0.9; transform: scale(1); }
+}
+
+/* ---------------------------------------------------------
+   Layout / stage
+   --------------------------------------------------------- */
+.stage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.screen {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glassmorphism card */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: var(--shadow-soft);
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 28px;
+  padding: 48px 36px 40px;
+  text-align: center;
+  position: relative;
+  animation: scaleIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(232, 184, 75, 0.4), rgba(255, 179, 198, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.card-emblem {
+  font-size: 2.6rem;
+  margin-bottom: 6px;
+  animation: floatBob 4s ease-in-out infinite;
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 5vw, 2.35rem);
+  line-height: 1.25;
+  margin: 4px 0 2px;
+  color: var(--turquoise-dark);
+  font-weight: 700;
+}
+
+.title .accent {
+  background: linear-gradient(90deg, var(--coral), var(--gold) 50%, var(--blossom-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.fa-line {
+  font-family: "Vazirmatn", sans-serif;
+  color: var(--turquoise);
+  font-size: 1.05rem;
+  margin: 0 0 14px;
+  opacity: 0.85;
+}
+
+.fa-line.small {
+  margin-top: 18px;
+  font-size: 0.95rem;
+}
+
+.subtitle {
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+/* ---------------------------------------------------------
+   Form
+   --------------------------------------------------------- */
+.name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--turquoise-dark);
+  padding-left: 4px;
+}
+
+.name-input {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 2px solid rgba(31, 163, 154, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+.name-input::placeholder {
+  color: #b9ad98;
+}
+
+.name-input:focus {
+  border-color: var(--turquoise);
+  box-shadow: 0 0 0 4px rgba(31, 163, 154, 0.15);
+}
+
+.name-input.invalid {
+  border-color: var(--coral);
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+
+.btn-primary {
+  position: relative;
+  margin-top: 6px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--turquoise), var(--turquoise-dark));
+  box-shadow: 0 10px 24px rgba(15, 111, 104, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 14px 30px rgba(15, 111, 104, 0.42);
+  filter: brightness(1.05);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  display: none;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-primary.loading .btn-spinner {
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.form-message {
+  min-height: 1.2em;
+  font-size: 0.9rem;
+  margin: 2px 0 0;
+  text-align: center;
+  color: var(--coral);
+  font-weight: 500;
+}
+
+.form-message.success {
+  color: var(--leaf);
+}
+
+/* ---------------------------------------------------------
+   Greeting screen
+   --------------------------------------------------------- */
+.greeting-card {
+  max-width: 560px;
+  padding: 52px 40px 46px;
+}
+
+.greeting-emblem {
+  font-size: 2.2rem;
+  letter-spacing: 10px;
+  margin-bottom: 10px;
+  animation: floatBob 5s ease-in-out infinite;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--coral);
+  margin: 0 0 6px;
+}
+
+.greeting-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  line-height: 1.3;
+  margin: 0 0 18px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.greeting-name {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--turquoise-dark), var(--turquoise) 45%, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  padding: 0 4px;
+}
+
+.greeting-message {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  max-width: 44ch;
+  margin: 0 auto 24px;
+}
+
+.haft-seen {
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.haft-seen span {
+  animation: floatBob 3.6s ease-in-out infinite;
+}
+.haft-seen span:nth-child(2) { animation-delay: 0.3s; }
+.haft-seen span:nth-child(3) { animation-delay: 0.6s; }
+.haft-seen span:nth-child(4) { animation-delay: 0.9s; }
+.haft-seen span:nth-child(5) { animation-delay: 1.2s; }
+
+/* ---------------------------------------------------------
+   Screen transitions
+   --------------------------------------------------------- */
+@keyframes scaleIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeOutScale {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
+.screen[hidden] {
+  display: none !important;
+}
+
+.screen.leaving {
+  animation: fadeOutScale 0.45s ease forwards;
+}
+
+/* Staggered greeting text entrance */
+.greeting-card .eyebrow,
+.greeting-card .greeting-title,
+.greeting-card .greeting-message,
+.greeting-card .haft-seen,
+.greeting-card .fa-line {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.greeting-card .eyebrow { animation-delay: 0.05s; }
+.greeting-card .greeting-title { animation-delay: 0.15s; }
+.greeting-card .greeting-message { animation-delay: 0.28s; }
+.greeting-card .haft-seen { animation-delay: 0.4s; }
+.greeting-card .fa-line { animation-delay: 0.5s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+@media (max-width: 480px) {
+  .card {
+    padding: 38px 24px 32px;
+    border-radius: 22px;
+  }
+  .greeting-card {
+    padding: 42px 24px 34px;
+  }
+  .subtitle {
+    font-size: 0.92rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .card {
+    padding: 56px 48px 48px;
+  }
+}
+
+/* ---------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sky { animation: none; }
+  .petal, .sparkle { display: none; }
+}

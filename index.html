@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Nowruz 🌸 | Persian New Year Greeting</title>
+<meta name="description" content="A beautiful Nowruz (Persian New Year) greeting card. Enter your name and receive a festive personalized greeting." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Vazirmatn:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Decorative animated background layers (purely visual, aria-hidden) -->
+<div class="sky" aria-hidden="true"></div>
+<div class="petals" id="petals" aria-hidden="true"></div>
+<div class="sparkles" id="sparkles" aria-hidden="true"></div>
+
+<main class="stage">
+
+  <!-- ===================== SCREEN 1 — NAME ENTRY ===================== -->
+  <section id="name-screen" class="screen name-screen" aria-labelledby="welcome-title">
+    <div class="card glass">
+      <div class="card-emblem" aria-hidden="true">🌷</div>
+
+      <h1 id="welcome-title" class="title">
+        Welcome to <span class="accent">Nowruz</span> <span aria-hidden="true">🌸</span>
+      </h1>
+      <p class="fa-line" lang="fa" dir="rtl">نوروز پیروز</p>
+      <p class="subtitle">
+        Spring has arrived, and with it, a brand new year. Tell us your name to receive your own personal Nowruz greeting.
+      </p>
+
+      <form id="name-form" class="name-form" novalidate>
+        <label for="name-input" class="field-label">Enter your name</label>
+        <input
+          id="name-input"
+          name="name"
+          type="text"
+          class="name-input"
+          placeholder="e.g. Ahmed"
+          autocomplete="given-name"
+          maxlength="100"
+          aria-describedby="form-message"
+          aria-required="true"
+        />
+
+        <button type="submit" id="continue-btn" class="btn-primary">
+          <span class="btn-label">Continue</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+
+        <p id="form-message" class="form-message" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== SCREEN 2 — GREETING ===================== -->
+  <section id="greeting-screen" class="screen greeting-screen" hidden aria-labelledby="greeting-title">
+    <div class="card glass greeting-card" tabindex="-1">
+      <div class="greeting-emblem" aria-hidden="true">🌸✨🌷</div>
+
+      <p class="eyebrow">Happy Nowruz New Year</p>
+      <h2 id="greeting-title" class="greeting-title">
+        <span id="greeting-name" class="greeting-name">Friend</span>
+        <span aria-hidden="true">🎉</span>
+      </h2>
+
+      <p class="greeting-message">
+        May this new year bring you happiness, peace, prosperity, and beautiful new
+        beginnings — like the first blossoms of spring. 🌸✨
+      </p>
+
+      <div class="haft-seen" aria-hidden="true">
+        <span>🌿</span><span>🌼</span><span>🥚</span><span>🕊️</span><span>🌱</span>
+      </div>
+
+      <p class="fa-line small" lang="fa" dir="rtl">سال نو مبارک</p>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

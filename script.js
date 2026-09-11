@@ -42,6 +42,12 @@ try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   firebaseReady = true;
+
+  // Diagnostic only — projectId is not a secret (it's already visible in
+  // every Firestore request URL and in firebaseConfig above). Confirms the
+  // deployed script.js is actually pointing at the intended project, e.g.
+  // after a CDN/cache issue or editing the wrong copy of this file.
+  console.info("[Firebase] connected project:", app.options.projectId);
 } catch (err) {
   // Initialization fails, e.g. if firebaseConfig still holds placeholder
   // values, or Firestore isn't reachable. We handle this gracefully at

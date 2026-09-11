@@ -1,90 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Happy Nowruz 🌸 | Persian New Year Greeting</title>
-<meta name="description" content="A beautiful Nowruz (Persian New Year) greeting card. Enter your name and receive a festive personalized greeting." />
+<title>عيد النيروز القبطي 🌴 | Coptic New Year — Nayrouz</title>
+<meta name="description" content="عيد النيروز القبطي السعيد — احتفل معنا ببداية السنة القبطية الجديدة. Happy Coptic New Year — celebrate the Coptic Nayrouz with a personalized festive greeting." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Vazirmatn:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>" />
 
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- Decorative animated background layers (purely visual, aria-hidden) -->
-<div class="sky" aria-hidden="true"></div>
-<div class="petals" id="petals" aria-hidden="true"></div>
-<div class="sparkles" id="sparkles" aria-hidden="true"></div>
+<!-- =========================================================
+     Reusable decorative motifs (Coptic cross, winged sun disk,
+     lotus, guava, dates, palm frond) — defined once, drawn many
+     times via <use> to keep markup light.
+     ========================================================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gradGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7e2a0" />
+      <stop offset="45%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#a9791f" />
+    </linearGradient>
+    <linearGradient id="gradGoldSoft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff3d1" />
+      <stop offset="100%" stop-color="#e3bf5c" />
+    </linearGradient>
+    <linearGradient id="gradGuava" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#c9dd8f" />
+      <stop offset="55%" stop-color="#8fae52" />
+      <stop offset="100%" stop-color="#5e7d34" />
+    </linearGradient>
+    <linearGradient id="gradGuavaFlesh" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7c9d6" />
+      <stop offset="100%" stop-color="#e17f96" />
+    </linearGradient>
+    <linearGradient id="gradDate" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9c3245" />
+      <stop offset="55%" stop-color="#711c29" />
+      <stop offset="100%" stop-color="#4a0f18" />
+    </linearGradient>
+    <linearGradient id="gradLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7fa066" />
+      <stop offset="100%" stop-color="#3e5c34" />
+    </linearGradient>
 
-<main class="stage">
+    <!-- Coptic cross (potent style with flared ends, as on the Coptic flag) -->
+    <symbol id="motif-cross" viewBox="0 0 100 100">
+      <g fill="url(#gradGold)" stroke="#7a5a12" stroke-width="1.2">
+        <rect x="42" y="8" width="16" height="84" rx="3" />
+        <rect x="8" y="42" width="84" height="16" rx="3" />
+        <rect x="30" y="4" width="40" height="11" rx="4" />
+        <rect x="30" y="85" width="40" height="11" rx="4" />
+        <rect x="4" y="30" width="11" height="40" rx="4" />
+        <rect x="85" y="30" width="11" height="40" rx="4" />
+        <circle cx="9.5" cy="9.5" r="5.5" />
+        <circle cx="90.5" cy="9.5" r="5.5" />
+        <circle cx="9.5" cy="90.5" r="5.5" />
+        <circle cx="90.5" cy="90.5" r="5.5" />
+        <circle cx="50" cy="50" r="9" fill="url(#gradGoldSoft)" />
+      </g>
+    </symbol>
 
-  <!-- ===================== SCREEN 1 — NAME ENTRY ===================== -->
-  <section id="name-screen" class="screen name-screen" aria-labelledby="welcome-title">
-    <div class="card glass">
-      <div class="card-emblem" aria-hidden="true">🌷</div>
+    <!-- Ancient-Egyptian winged sun disk -->
+    <symbol id="motif-winged-disk" viewBox="0 0 320 110">
+      <g fill="url(#gradGold)" opacity="0.92">
+        <ellipse cx="118" cy="52" rx="58" ry="13" transform="rotate(-18 118 52)" />
+        <ellipse cx="86" cy="44" rx="52" ry="11.5" transform="rotate(-28 86 44)" />
+        <ellipse cx="54" cy="38" rx="46" ry="10" transform="rotate(-38 54 38)" />
+        <ellipse cx="24" cy="36" rx="38" ry="8.5" transform="rotate(-48 24 36)" />
+        <ellipse cx="202" cy="52" rx="58" ry="13" transform="rotate(18 202 52)" />
+        <ellipse cx="234" cy="44" rx="52" ry="11.5" transform="rotate(28 234 44)" />
+        <ellipse cx="266" cy="38" rx="46" ry="10" transform="rotate(38 266 38)" />
+        <ellipse cx="296" cy="36" rx="38" ry="8.5" transform="rotate(48 296 36)" />
+      </g>
+      <circle cx="160" cy="50" r="26" fill="url(#gradGold)" stroke="#7a5a12" stroke-width="1.5" />
+      <circle cx="160" cy="50" r="16" fill="url(#gradGoldSoft)" />
+      <path d="M136 78 Q160 100 184 78 L178 68 Q160 82 142 68 Z" fill="url(#gradGold)" stroke="#7a5a12" stroke-width="1" />
+    </symbol>
 
-      <h1 id="welcome-title" class="title">
-        Welcome to <span class="accent">Nowruz</span> <span aria-hidden="true">🌸</span>
-      </h1>
-      <p class="fa-line" lang="fa" dir="rtl">نوروز پیروز</p>
-      <p class="subtitle">
-        Spring has arrived, and with it, a brand new year. Tell us your name to receive your own personal Nowruz greeting.
-      </p>
+    <!-- Lotus flourish -->
+    <symbol id="motif-lotus" viewBox="0 0 100 90">
+      <g fill="url(#gradGold)" stroke="#7a5a12" stroke-width="1">
+        <path d="M50 88 C50 60 50 40 50 18 C58 34 62 50 56 70 Z" />
+        <path d="M50 88 C50 60 50 40 50 18 C42 34 38 50 44 70 Z" />
+        <path d="M50 84 C32 66 22 48 20 28 C36 34 46 48 50 70 Z" opacity="0.9" />
+        <path d="M50 84 C68 66 78 48 80 28 C64 34 54 48 50 70 Z" opacity="0.9" />
+      </g>
+    </symbol>
+
+    <!-- Whole guava — جوافة -->
+    <symbol id="motif-guava" viewBox="0 0 120 120">
+      <path d="M60 100 C90 100 100 72 96 50 C93 32 78 18 60 18 C42 18 27 32 24 50 C20 72 30 100 60 100 Z" fill="url(#gradGuava)" stroke="#4b6329" stroke-width="1.5" />
+      <path d="M45 30 C50 24 58 20 60 18 C55 26 50 34 48 44 Z" fill="#e8748a" opacity="0.5" />
+      <ellipse cx="46" cy="42" rx="10" ry="6" fill="#fff" opacity="0.32" />
+      <g fill="#4b6329" opacity="0.4">
+        <circle cx="50" cy="52" r="1.6" /><circle cx="70" cy="48" r="1.4" /><circle cx="66" cy="68" r="1.5" />
+        <circle cx="52" cy="74" r="1.4" /><circle cx="78" cy="62" r="1.4" /><circle cx="40" cy="62" r="1.3" />
+      </g>
+      <g stroke="#3f5522" stroke-width="1.4" stroke-linecap="round">
+        <path d="M60 92 L60 98" /><path d="M56 94 L60 98" /><path d="M64 94 L60 98" />
+      </g>
+      <circle cx="60" cy="98" r="2.4" fill="#3f5522" />
+      <path d="M60 18 C57 12 58 6 62 2" fill="none" stroke="#5e4324" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M62 6 C70 2 78 4 82 10 C74 12 66 12 62 6 Z" fill="url(#gradLeaf)" />
+      <path d="M64 6 Q73 6 80 10" stroke="#3e5c34" stroke-width="1" fill="none" opacity="0.6" />
+    </symbol>
+
+    <!-- Halved guava, pink flesh — جوافة مقطوعة -->
+    <symbol id="motif-guava-cut" viewBox="0 0 120 120">
+      <path d="M60 102 C92 102 102 74 98 50 C95 30 78 16 60 16 C42 16 25 30 22 50 C18 74 28 102 60 102 Z" fill="url(#gradGuava)" stroke="#4b6329" stroke-width="1.5" />
+      <path d="M60 96 C84 96 92 72 89 52 C86 35 74 24 60 24 C46 24 34 35 31 52 C28 72 36 96 60 96 Z" fill="url(#gradGuavaFlesh)" />
+      <g fill="#7a2f3a">
+        <circle cx="48" cy="46" r="2.6" /><circle cx="60" cy="40" r="2.6" /><circle cx="72" cy="46" r="2.6" />
+        <circle cx="42" cy="60" r="2.6" /><circle cx="60" cy="56" r="2.6" /><circle cx="78" cy="60" r="2.6" />
+        <circle cx="50" cy="74" r="2.6" /><circle cx="68" cy="76" r="2.6" /><circle cx="60" cy="86" r="2.6" />
+      </g>
+      <path d="M60 16 C57 10 58 5 62 1" fill="none" stroke="#5e4324" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M62 5 C70 1 78 3 82 9 C74 11 66 11 62 5 Z" fill="url(#gradLeaf)" />
+    </symbol>
+
+    <!-- Red dates cluster — البلح الأحمر -->
+    <symbol id="motif-dates" viewBox="0 0 120 120">
+      <path d="M58 8 C56 22 55 34 55 46" fill="none" stroke="#5e4324" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M55 20 C40 12 24 14 16 24 C30 25 42 24 55 22 Z" fill="url(#gradLeaf)" opacity="0.85" />
+      <path d="M58 20 C73 12 89 14 97 24 C83 25 71 24 58 22 Z" fill="url(#gradLeaf)" opacity="0.85" />
+      <g stroke="#5e4324" stroke-width="1.6" fill="none">
+        <path d="M55 46 L36 58" />
+        <path d="M55 46 L60 54" />
+        <path d="M56 48 L84 60" />
+        <path d="M56 60 L30 82" />
+        <path d="M56 62 L58 88" />
+        <path d="M57 60 L84 82" />
+      </g>
+      <g stroke="#3a0c12" stroke-width="1">
+        <ellipse cx="36" cy="64" rx="11" ry="16" transform="rotate(-15 36 64)" fill="url(#gradDate)" />
+        <ellipse cx="62" cy="58" rx="10" ry="15" transform="rotate(8 62 58)" fill="url(#gradDate)" />
+        <ellipse cx="86" cy="66" rx="11" ry="16" transform="rotate(18 86 66)" fill="url(#gradDate)" />
+        <ellipse cx="30" cy="90" rx="11.5" ry="16.5" transform="rotate(-8 30 90)" fill="url(#gradDate)" />
+        <ellipse cx="58" cy="96" rx="12.5" ry="18" fill="url(#gradDate)" />
+        <ellipse cx="84" cy="90" rx="11" ry="16" transform="rotate(10 84 90)" fill="url(#gradDate)" />
+      </g>
+      <g fill="#c96b7a" opacity="0.5">
+        <ellipse cx="33" cy="56" rx="3" ry="6" transform="rotate(-15 33 56)" />
+        <ellipse cx="59" cy="50" rx="3" ry="5.5" transform="rotate(8 59 50)" />
+        <ellipse cx="83" cy="58" rx="3" ry="6" transform="rotate(18 83 58)" />
+        <ellipse cx="27" cy="82" rx="3" ry="6" transform="rotate(-8 27 82)" />
+        <ellipse cx="55" cy="86" rx="3.2" ry="6.5" />
+        <ellipse cx="81" cy="82" rx="3" ry="6" transform="rotate(10 81 82)" />
+      </g>
+    </symbol>
+
+    <!-- Palm frond -->
+    <symbol id="motif-palm" viewBox="0 0 200 90">
+      <path d="M100 88 C100 60 100 30 96 4" fill="none" stroke="#3e5c34" stroke-width="2.5" />
+      <g fill="url(#gradLeaf)">
+        <path d="M97 10 C70 4 40 10 12 26 C46 28 74 24 97 20 Z" />
+        <path d="M97 24 C68 22 36 30 10 48 C44 46 72 38 97 32 Z" />
+        <path d="M97 40 C70 42 42 52 20 68 C50 62 76 52 97 46 Z" />
+        <path d="M99 10 C126 4 156 10 184 26 C150 28 122 24 99 20 Z" />
+        <path d="M99 24 C128 22 160 30 186 48 C152 46 124 38 99 32 Z" />
+        <path d="M99 40 C126 42 154 52 176 68 C146 62 120 52 99 46 Z" />
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- =========================================================
+     Fixed decorative background layers (purely visual)
+     ========================================================= -->
+<div class="bg-base" aria-hidden="true"></div>
+<div class="bg-rays" aria-hidden="true"></div>
+<div class="bg-pattern" aria-hidden="true"></div>
+<div class="bg-vignette" aria-hidden="true"></div>
+<div class="bg-particles" id="particles" aria-hidden="true"></div>
+<div class="bg-leaves" id="leaves" aria-hidden="true"></div>
+
+<main class="page">
+  <section class="hero" id="hero">
+
+    <div class="hero-ornament-top" aria-hidden="true">
+      <svg class="ornament-disk" viewBox="0 0 320 110"><use href="#motif-winged-disk" /></svg>
+      <svg class="ornament-cross" viewBox="0 0 100 100"><use href="#motif-cross" /></svg>
+    </div>
+
+    <p class="eyebrow-ar" lang="ar" dir="rtl">عيد النيروز القبطي</p>
+
+    <h1 class="hero-title">
+      <span class="hero-title-en" dir="ltr">Happy Coptic New Year</span>
+    </h1>
+
+    <div class="year-medallion">
+      <svg class="lotus lotus--left" viewBox="0 0 100 90" aria-hidden="true"><use href="#motif-lotus" /></svg>
+      <div class="medallion-frame">
+        <span class="year-number" id="coptic-year">1743</span>
+        <span class="year-caption" lang="ar" dir="rtl">للشهداء</span>
+      </div>
+      <svg class="lotus lotus--right" viewBox="0 0 100 90" aria-hidden="true"><use href="#motif-lotus" /></svg>
+    </div>
+
+
+    <!-- Floating illustrated fruits -->
+    <svg class="fruit fruit--guava-1" viewBox="0 0 120 120" aria-hidden="true"><use href="#motif-guava" /></svg>
+    <svg class="fruit fruit--dates-1" viewBox="0 0 120 120" aria-hidden="true"><use href="#motif-dates" /></svg>
+    <svg class="fruit fruit--guava-2" viewBox="0 0 120 120" aria-hidden="true"><use href="#motif-guava-cut" /></svg>
+    <svg class="fruit fruit--dates-2" viewBox="0 0 120 120" aria-hidden="true"><use href="#motif-dates" /></svg>
+    <svg class="fruit fruit--palm-1" viewBox="0 0 200 90" aria-hidden="true"><use href="#motif-palm" /></svg>
+    <svg class="fruit fruit--palm-2" viewBox="0 0 200 90" aria-hidden="true"><use href="#motif-palm" /></svg>
+
+    <div class="celebrate-card" id="celebrate-card">
+      <label for="name-input" class="celebrate-label" lang="ar" dir="rtl">اكتب اسمك  🎉</label>
 
       <form id="name-form" class="name-form" novalidate>
-        <label for="name-input" class="field-label">Enter your name</label>
         <input
           id="name-input"
           name="name"
           type="text"
           class="name-input"
-          placeholder="e.g. Ahmed"
+          placeholder="اكتب اسمك هنا"
+          dir="auto"
           autocomplete="given-name"
-          maxlength="100"
+          maxlength="60"
           aria-describedby="form-message"
-          aria-required="true"
         />
-
-        <button type="submit" id="continue-btn" class="btn-primary">
-          <span class="btn-label">Continue</span>
-          <span class="btn-spinner" aria-hidden="true"></span>
+        <button type="submit" class="btn-celebrate" lang="ar" dir="rtl">
+          <span>احتفل بالنيروز</span>
         </button>
-
-        <p id="form-message" class="form-message" role="alert" aria-live="polite"></p>
       </form>
+
+      <p id="form-message" class="form-message" role="alert" aria-live="polite" lang="ar" dir="rtl"></p>
+    </div>
+
+    <div class="fruit-strip" aria-hidden="true">
+      <svg viewBox="0 0 120 120"><use href="#motif-guava" /></svg>
+      <svg viewBox="0 0 120 120"><use href="#motif-dates" /></svg>
+      <svg viewBox="0 0 120 120"><use href="#motif-guava-cut" /></svg>
     </div>
   </section>
-
-  <!-- ===================== SCREEN 2 — GREETING ===================== -->
-  <section id="greeting-screen" class="screen greeting-screen" hidden aria-labelledby="greeting-title">
-    <div class="card glass greeting-card" tabindex="-1">
-      <div class="greeting-emblem" aria-hidden="true">🌸✨🌷</div>
-
-      <p class="eyebrow">Happy Nowruz New Year</p>
-      <h2 id="greeting-title" class="greeting-title">
-        <span id="greeting-name" class="greeting-name">Friend</span>
-        <span aria-hidden="true">🎉</span>
-      </h2>
-
-      <p class="greeting-message">
-        May this new year bring you happiness, peace, prosperity, and beautiful new
-        beginnings — like the first blossoms of spring. 🌸✨
-      </p>
-
-      <div class="haft-seen" aria-hidden="true">
-        <span>🌿</span><span>🌼</span><span>🥚</span><span>🕊️</span><span>🌱</span>
-      </div>
-
-      <p class="fa-line small" lang="fa" dir="rtl">سال نو مبارک</p>
-    </div>
-  </section>
-
 </main>
+
+<!-- ===================== Celebration overlay ===================== -->
+<div class="greeting-overlay" id="greeting-overlay" hidden>
+  <div class="greeting-backdrop" id="greeting-backdrop"></div>
+
+  <div class="greeting-card" id="greeting-card" role="dialog" aria-modal="true" aria-labelledby="greeting-title" tabindex="-1">
+    <button type="button" class="greeting-close" id="greeting-close" aria-label="إغلاق">×</button>
+
+    <svg class="greeting-cross" viewBox="0 0 100 100" aria-hidden="true"><use href="#motif-cross" /></svg>
+
+    <p class="greeting-eyebrow" dir="ltr">Happy New Nayroz Year <span aria-hidden="true">🎉</span></p>
+    <h2 id="greeting-title" class="greeting-name-title">
+      <span id="greeting-name" class="greeting-name" dir="auto">Marc</span>
+    </h2>
+    <p class="greeting-sub-ar" lang="ar" dir="rtl">عام سعيد مليء بالفرح والبركة 🌴</p>
+
+    <div class="greeting-fruits" aria-hidden="true">
+      <svg viewBox="0 0 120 120"><use href="#motif-guava" /></svg>
+      <svg viewBox="0 0 120 120"><use href="#motif-dates" /></svg>
+      <svg viewBox="0 0 120 120"><use href="#motif-guava-cut" /></svg>
+    </div>
+  </div>
+
+  <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+</div>
 
 <script type="module" src="script.js"></script>
 </body>

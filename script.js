@@ -1,136 +1,164 @@
 // =============================================================
-// Nowruz Greeting — script.js
-// Vanilla JavaScript + Firebase Firestore (modular Web SDK, CDN)
+// Coptic Nayrouz (عيد النيروز القبطي) — script.js
+// Vanilla JavaScript. The name/greeting interaction is entirely
+// client-side (no reload, no navigation, no API round-trip).
+// Optional, non-blocking Firebase logging is kept at the bottom
+// purely as background analytics — it never gates the UI.
 // =============================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
 // -------------------------------------------------------------
-// 🔥 FIREBASE CONFIGURATION — project: nayroz-new-year 🔥
+// Coptic year calculation
 //
-// This is the Firebase Web SDK config for the dedicated Nowruz
-// project. It is safe to keep in frontend code — it only
-// identifies the project, it does not grant admin access. Access
-// control is handled entirely by Firestore Security Rules (see
-// firestore.rules / README.md). Only Firestore is used here —
-// Firebase Analytics is intentionally not initialized, since this
-// app collects nothing beyond the visitor's name and timestamp.
+// Nayrouz (Coptic New Year) falls on 11 September (Gregorian),
+// except it falls on 12 September in the Gregorian year that
+// immediately precedes a Gregorian leap year — because the
+// underlying Julian calendar's leap day lands a day later than
+// the Gregorian one. This holds from 1900 through 2099.
+// Coptic year = Gregorian year - 283 once Nayrouz has occurred
+// this year, otherwise - 284.
 // -------------------------------------------------------------
-const firebaseConfig = {
-  apiKey: "AIzaSyDfGdkRYHNjDbPuoQoMjoQiRJ4mHSi6GVo",
-  authDomain: "nayroz-new-year.firebaseapp.com",
-  projectId: "nayroz-new-year",
-  storageBucket: "nayroz-new-year.firebasestorage.app",
-  messagingSenderId: "178291135911",
-  appId: "1:178291135911:web:1dca659a4abe50f1fbd282",
-  measurementId: "G-2T2XT3Y7BE",
-};
+function isGregorianLeapYear(year) {
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+}
 
-const VISITORS_COLLECTION = "nayroz_users";
-const MAX_NAME_LENGTH = 100;
+function getNayrouzDay(gregorianYear) {
+  return isGregorianLeapYear(gregorianYear + 1) ? 12 : 11;
+}
 
-let db = null;
-let firebaseReady = false;
+function getCopticNewYear(date = new Date()) {
+  const year = date.getFullYear();
+  const nayrouzThisYear = new Date(year, 8, getNayrouzDay(year)); // month 8 = September
+  const hasPassed = date >= nayrouzThisYear;
+  return hasPassed ? year - 283 : year - 284;
+}
 
-try {
-  const app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  firebaseReady = true;
-
-  // Diagnostic only — projectId is not a secret (it's already visible in
-  // every Firestore request URL and in firebaseConfig above). Confirms the
-  // deployed script.js is actually pointing at the intended project, e.g.
-  // after a CDN/cache issue or editing the wrong copy of this file.
-  console.info("[Firebase] connected project:", app.options.projectId);
-} catch (err) {
-  // Initialization fails, e.g. if firebaseConfig still holds placeholder
-  // values, or Firestore isn't reachable. We handle this gracefully at
-  // submit time rather than crashing the page.
-  console.error("Firebase failed to initialize:", err);
-  firebaseReady = false;
+const copticYearEl = document.getElementById("coptic-year");
+if (copticYearEl) {
+  copticYearEl.textContent = String(getCopticNewYear());
 }
 
 // -------------------------------------------------------------
 // DOM references
 // -------------------------------------------------------------
-const nameScreen = document.getElementById("name-screen");
-const greetingScreen = document.getElementById("greeting-screen");
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
-const continueBtn = document.getElementById("continue-btn");
 const formMessage = document.getElementById("form-message");
+
+const greetingOverlay = document.getElementById("greeting-overlay");
+const greetingBackdrop = document.getElementById("greeting-backdrop");
+const greetingCard = document.getElementById("greeting-card");
+const greetingClose = document.getElementById("greeting-close");
 const greetingName = document.getElementById("greeting-name");
+const confettiLayer = document.getElementById("confetti-layer");
 
-let isSubmitting = false;
+const MAX_NAME_LENGTH = 60;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let lastFocusedEl = null;
 
 // -------------------------------------------------------------
-// Helpers
+// Greeting overlay open/close
 // -------------------------------------------------------------
-function setFormMessage(text, type = "error") {
-  formMessage.textContent = text;
-  formMessage.classList.toggle("success", type === "success");
-}
-
-function setLoading(isLoading) {
-  isSubmitting = isLoading;
-  continueBtn.disabled = isLoading;
-  continueBtn.classList.toggle("loading", isLoading);
-  continueBtn.querySelector(".btn-label").textContent = isLoading
-    ? "Preparing your greeting..."
-    : "Continue";
-  continueBtn.setAttribute("aria-busy", String(isLoading));
-}
-
-function showGreeting(name) {
+function openGreeting(name) {
   // Safe by construction: textContent never interprets HTML/script.
   greetingName.textContent = name;
 
-  nameScreen.classList.add("leaving");
-  nameScreen.addEventListener(
-    "animationend",
-    () => {
-      nameScreen.hidden = true;
-      nameScreen.classList.remove("leaving");
-      greetingScreen.hidden = false;
-      greetingScreen.querySelector(".card").focus?.();
-    },
-    { once: true }
-  );
+  lastFocusedEl = document.activeElement;
+  greetingOverlay.hidden = false;
+  greetingCard.focus();
+  document.body.style.overflow = "hidden";
+
+  spawnConfetti();
 }
 
-async function saveVisitor(name) {
-  if (!firebaseReady || !db) {
-    throw new Error("Firebase is not initialized. Check firebaseConfig in script.js.");
+function closeGreeting() {
+  greetingOverlay.hidden = true;
+  document.body.style.overflow = "";
+  confettiLayer.innerHTML = "";
+  if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+    lastFocusedEl.focus();
+  }
+}
+
+greetingClose.addEventListener("click", closeGreeting);
+greetingBackdrop.addEventListener("click", closeGreeting);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !greetingOverlay.hidden) {
+    closeGreeting();
+  }
+});
+
+// -------------------------------------------------------------
+// Confetti — lightweight, small fixed count, cleaned up via CSS
+// animation lifetime (no continuous DOM growth).
+// -------------------------------------------------------------
+const CONFETTI_COLORS = ["#d4af37", "#f3d97e", "#7a1f2b", "#e8748a", "#6f8f3f", "#2ea8a0"];
+
+function spawnConfetti() {
+  if (reduceMotion) return;
+
+  confettiLayer.innerHTML = "";
+  const count = window.innerWidth < 640 ? 26 : 46;
+  const fragment = document.createDocumentFragment();
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+
+    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    const size = 6 + Math.random() * 8;
+    const shape = Math.floor(Math.random() * 3); // 0 diamond, 1 circle, 2 cross-bar
+
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.width = `${size}px`;
+    piece.style.height = `${size}px`;
+    piece.style.background = color;
+
+    if (shape === 0) {
+      piece.style.transform = "rotate(45deg)";
+    } else if (shape === 1) {
+      piece.style.borderRadius = "50%";
+    } else {
+      piece.style.height = `${size / 3}px`;
+      piece.style.borderRadius = "2px";
+    }
+
+    const duration = 2.6 + Math.random() * 1.8;
+    const delay = Math.random() * 0.4;
+    const drift = (Math.random() - 0.5) * 220;
+    const spin = 250 + Math.random() * 400;
+
+    piece.style.animationDuration = `${duration}s`;
+    piece.style.animationDelay = `${delay}s`;
+    piece.style.setProperty("--drift", `${drift}px`);
+    piece.style.setProperty("--spin", `${spin}deg`);
+
+    fragment.appendChild(piece);
   }
 
-  // Only "name" and "createdAt" are stored — no device, browser, or
-  // location information is collected.
-  await addDoc(collection(db, VISITORS_COLLECTION), {
-    name,
-    createdAt: serverTimestamp(),
-  });
+  confettiLayer.appendChild(fragment);
+
+  window.setTimeout(() => {
+    confettiLayer.innerHTML = "";
+  }, 5000);
 }
 
 // -------------------------------------------------------------
-// Form submit handling
+// Form submit — entirely client-side: no reload, no navigation,
+// no required network call to show the greeting.
 // -------------------------------------------------------------
-nameForm.addEventListener("submit", async (event) => {
+function setFormMessage(text) {
+  formMessage.textContent = text;
+}
+
+nameForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  if (isSubmitting) return; // guard against duplicate submissions
-
-  const rawName = nameInput.value;
-  const name = rawName.trim().slice(0, MAX_NAME_LENGTH);
+  const name = nameInput.value.trim().slice(0, MAX_NAME_LENGTH);
 
   if (!name) {
     nameInput.classList.add("invalid");
-    setFormMessage("Please enter your name to continue. 🌸");
+    setFormMessage("من فضلك اكتب اسمك أولاً ❤️");
     nameInput.focus();
     nameInput.addEventListener(
       "animationend",
@@ -141,79 +169,108 @@ nameForm.addEventListener("submit", async (event) => {
   }
 
   setFormMessage("");
-  setLoading(true);
-
-  try {
-    await saveVisitor(name);
-    setLoading(false);
-    setFormMessage("Welcome! 🌷", "success");
-    showGreeting(name);
-  } catch (err) {
-    console.error("Failed to save visitor to Firestore:", err);
-    setLoading(false);
-    setFormMessage("Something went wrong. Please try again.");
-    // Name is intentionally left in the input so the user doesn't retype it.
-  }
+  openGreeting(name);
+  logVisitorInBackground(name);
 });
 
-// Clear the invalid state as soon as the user starts typing again.
 nameInput.addEventListener("input", () => {
   if (nameInput.classList.contains("invalid")) {
     nameInput.classList.remove("invalid");
   }
+  if (formMessage.textContent) {
+    setFormMessage("");
+  }
 });
 
 // -------------------------------------------------------------
-// Decorative background: floating petals + sparkles
-// (Purely visual — respects prefers-reduced-motion.)
+// Decorative background: floating golden particles + palm leaves.
+// Purely visual, DOM-light, respects prefers-reduced-motion.
 // -------------------------------------------------------------
 function initBackgroundEffects() {
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion) return;
 
-  const petalsContainer = document.getElementById("petals");
-  const sparklesContainer = document.getElementById("sparkles");
-  const petalEmojis = ["🌸", "🌷", "🌼", "🌺"];
+  const particlesContainer = document.getElementById("particles");
+  const leavesContainer = document.getElementById("leaves");
 
-  const petalCount = window.innerWidth < 600 ? 10 : 18;
-  for (let i = 0; i < petalCount; i++) {
-    const petal = document.createElement("span");
-    petal.className = "petal";
-    petal.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+  const particleCount = window.innerWidth < 600 ? 12 : 24;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("span");
+    particle.className = "particle";
 
-    const size = 14 + Math.random() * 18;
-    const duration = 10 + Math.random() * 12;
-    const delay = Math.random() * -20;
-    const left = Math.random() * 100;
-    const drift = (Math.random() - 0.5) * 160;
-
-    petal.style.left = `${left}vw`;
-    petal.style.fontSize = `${size}px`;
-    petal.style.animationDuration = `${duration}s`;
-    petal.style.animationDelay = `${delay}s`;
-    petal.style.setProperty("--drift", `${drift}px`);
-
-    petalsContainer.appendChild(petal);
-  }
-
-  const sparkleCount = window.innerWidth < 600 ? 14 : 26;
-  for (let i = 0; i < sparkleCount; i++) {
-    const sparkle = document.createElement("span");
-    sparkle.className = "sparkle";
-
-    const size = 3 + Math.random() * 5;
-    const duration = 2.5 + Math.random() * 3;
+    const size = 2 + Math.random() * 4;
+    const duration = 3 + Math.random() * 3.5;
     const delay = Math.random() * 5;
 
-    sparkle.style.left = `${Math.random() * 100}vw`;
-    sparkle.style.top = `${Math.random() * 100}vh`;
-    sparkle.style.width = `${size}px`;
-    sparkle.style.height = `${size}px`;
-    sparkle.style.animationDuration = `${duration}s`;
-    sparkle.style.animationDelay = `${delay}s`;
+    particle.style.left = `${Math.random() * 100}vw`;
+    particle.style.top = `${Math.random() * 100}vh`;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.animationDuration = `${duration}s`;
+    particle.style.animationDelay = `${delay}s`;
 
-    sparklesContainer.appendChild(sparkle);
+    particlesContainer.appendChild(particle);
+  }
+
+  const leafCount = window.innerWidth < 600 ? 3 : 6;
+  for (let i = 0; i < leafCount; i++) {
+    const leaf = document.createElement("span");
+    leaf.className = "leaf-drift";
+    leaf.innerHTML = '<svg viewBox="0 0 200 90"><use href="#motif-palm"></use></svg>';
+
+    const duration = 26 + Math.random() * 16;
+    const delay = Math.random() * -30;
+    const left = Math.random() * 100;
+    const drift = (Math.random() - 0.5) * 200;
+    const size = 40 + Math.random() * 30;
+
+    leaf.style.left = `${left}vw`;
+    leaf.style.width = `${size}px`;
+    leaf.style.animationDuration = `${duration}s`;
+    leaf.style.animationDelay = `${delay}s`;
+    leaf.style.setProperty("--drift", `${drift}px`);
+
+    leavesContainer.appendChild(leaf);
   }
 }
 
 initBackgroundEffects();
+
+// -------------------------------------------------------------
+// Optional background logging (Firebase Firestore) — fire and
+// forget. This never blocks or gates the celebration UI above;
+// it only records that a visitor celebrated, for the site owner
+// to see later in the Firebase Console.
+// -------------------------------------------------------------
+let logVisitorInBackground = () => {};
+
+(async function initOptionalLogging() {
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js");
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import(
+      "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"
+    );
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfGdkRYHNjDbPuoQoMjoQiRJ4mHSi6GVo",
+      authDomain: "nayroz-new-year.firebaseapp.com",
+      projectId: "nayroz-new-year",
+      storageBucket: "nayroz-new-year.firebasestorage.app",
+      messagingSenderId: "178291135911",
+      appId: "1:178291135911:web:1dca659a4abe50f1fbd282",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    logVisitorInBackground = (name) => {
+      addDoc(collection(db, "nayroz_users"), {
+        name,
+        createdAt: serverTimestamp(),
+      }).catch((err) => {
+        console.warn("Background visitor log failed (non-blocking):", err);
+      });
+    };
+  } catch (err) {
+    console.warn("Optional Firebase logging unavailable (non-blocking):", err);
+  }
+})();

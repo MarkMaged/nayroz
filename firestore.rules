@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // "nayroz_users" — Nowruz greeting visitor log.
+    // "nayroz_users" — Coptic Nayrouz greeting visitor log.
     // Public (unauthenticated) visitors may CREATE a document here when they
     // submit their name. Nobody — authenticated or not — may read the list
     // back, update, or delete entries from the client. View visitors only

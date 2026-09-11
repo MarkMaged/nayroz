@@ -1,8 +1,10 @@
-# 🌸 Nowruz Greeting — Persian New Year Web Page
+# 🌴 Coptic Nayrouz Greeting — عيد النيروز القبطي
 
-A beautiful, responsive, single-page Nowruz (Persian New Year) greeting card
-built with plain **HTML, CSS, and vanilla JavaScript**, backed by **Firebase
-Firestore** for storing visitor names.
+A beautiful, responsive, single-page Coptic New Year (Nayrouz) greeting card
+built with plain **HTML, CSS, and vanilla JavaScript**. The name/greeting
+interaction is entirely client-side (no reload, no navigation, nothing waits
+on a network call); an optional, non-blocking **Firebase Firestore** write
+in the background lets the site owner see who stopped by.
 
 No frameworks. No build step. This project is already wired up to a
 dedicated Firebase project created for it, **`nayroz-new-year`** — the
@@ -12,28 +14,31 @@ once the security rules below are published.
 ## File structure
 
 ```text
-nowruz-greeting/
+nayroz/
 │
-├── index.html        → page structure (name screen + greeting screen)
+├── index.html        → page structure (hero, name form, greeting overlay)
 ├── style.css         → all styling, gradients, animations, responsive layout
-├── script.js         → form logic, validation, Firebase Firestore integration
+├── script.js         → Coptic year calc, form logic, greeting, Firebase logging
 ├── firestore.rules   → the security rules, as text you paste into the Console
 └── README.md         → this file
 ```
 
 ## How it works
 
-1. The visitor lands on a **name entry screen** — the greeting is not shown yet.
-2. They type their name and press **Continue** (or hit Enter).
-3. If the name is empty, a validation message appears and nothing is saved.
-4. Otherwise the button shows a loading state ("Preparing your greeting...")
-   and is disabled to prevent duplicate submissions, while the name is saved
-   to Firestore.
-5. Only **after** the Firestore write succeeds does the page transition to
-   the **greeting screen**, showing "Happy Nowruz New Year, `<name>`! 🌸✨".
-6. If saving fails (e.g. no internet, misconfigured Firebase), the user stays
-   on the name screen, sees a friendly error message, and can try again
-   without losing what they typed.
+1. The visitor lands on the hero: **عيد النيروز القبطي**, the current Coptic
+   year (calculated dynamically from today's date — never hard-coded), and a
+   name form.
+2. They type their name and press **احتفل بالنيروز**.
+3. If the name is empty, an inline validation message appears
+   ("من فضلك اكتب اسمك أولاً ❤️") and nothing else happens.
+4. Otherwise a celebration overlay appears **immediately** — "Happy New
+   Nayroz Year 🎉" with the visitor's name, Coptic decorations, and a
+   confetti burst. This never waits on a network call: it's a purely
+   client-side interaction (no reload, no navigation, no required API call).
+5. In the background, the name is optionally also saved to Firestore
+   (fire-and-forget) purely so the site owner can see who celebrated — if
+   that write fails or is slow, the visitor never notices, since the
+   greeting already rendered.
 
 ---
 
@@ -291,17 +296,18 @@ above.
   user agent, or device/browser information is saved.
 - The visitor's name is displayed using `textContent` (never `innerHTML`),
   so it cannot be used to inject HTML or scripts into the page.
-- Name length is capped at 100 characters, both in the UI (`maxlength`) and
-  enforced server-side by the Firestore rules — and the rules reject any
-  document that contains fields other than `name`/`createdAt`.
+- Name length is capped at 60 characters in the UI (`maxlength`); the
+  Firestore rules separately enforce a 100-character server-side limit and
+  reject any document that contains fields other than `name`/`createdAt`.
 
 ## Customizing
 
 - **Colors & fonts**: edit the CSS custom properties at the top of
   [style.css](style.css) (`:root { ... }`).
-- **Greeting message**: edit the text inside `#greeting-screen` in
+- **Greeting content**: edit the text inside `#greeting-overlay` in
   [index.html](index.html).
-- **Firestore collection name**: change `VISITORS_COLLECTION` in
-  [script.js](script.js) (remember to update your security rules to match).
+- **Firestore collection name**: change the collection name passed to
+  `collection(db, ...)` in [script.js](script.js) (remember to update your
+  security rules to match).
 
-Happy Nowruz! 🌸✨ سال نو مبارک
+Happy Coptic Nayrouz! 🌴 عيد نيروز سعيد
